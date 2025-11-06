@@ -23,7 +23,7 @@
     </div>
 
     <!-- MODO DIFÍCIL -->
-    <div class="modo">
+    <div class="modo" id="modoDificil">
       <span class="texto-modo">Difícil</span>
       <div class="estrela">
         <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="estrela">
@@ -31,8 +31,7 @@
     </div>
 
     <!-- BOTÃO VOLTAR -->
-    <button class="botao-voltar" id="botaoVoltar">Voltar</button>
-    <button class="botao" id="botaoDificil">Dificil</button>
+    <button class="botao-voltar" id="botaoVoltar">Teste</button>
   </div>
 
   <!-- SCRIPT PARA VOLTAR -->
@@ -41,8 +40,9 @@
       window.location.href = "tela-inicial.html";
     });
 
-    document.getElementById("botaoDificil").addEventListener("click", () => {
-      window.location.href = "Dificil.html";
+    // Modo difícil
+    document.getElementById("modoDificil").addEventListener("click", () => {
+      window.location.href = "dificil.html";
     });
   </script>
 
