@@ -1,6 +1,6 @@
 // Função para voltar à tela inicial
 function voltarTela() {
-  window.location.href = "index.html"; // coloque aqui o nome correto do arquivo da tela inicial
+  window.location.href = "tela-inicial.html"; // coloque aqui o nome correto do arquivo da tela inicial
 }
 
 // Variável de pontuação
