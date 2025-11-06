@@ -1,0 +1,99 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* FUNDO */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #12054d; /* cor sólida */
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* CONTAINER */
+.container-modos {
+  background-color: #b55b17; /* cor sólida */
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+/* TÍTULO */
+.titulo {
+  font-size: 2rem;
+  margin-bottom: 40px;
+}
+
+/* MODOS */
+.modo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ec8533;
+  border-radius: 15px;
+  padding: 20px 15px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.modo:hover {
+  background-color: #f5a64f; /* leve destaque */
+}
+
+.texto-modo {
+  font-size: 1.5rem;
+}
+
+.estrela img {
+  width: 40px;
+  height: 40px;
+}
+/* MINI ICONE DE PONTUAÇÃO */
+.pontuacao-icon {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background-color: gold;
+  border-radius: 50%; /* círculo pequeno */
+  margin-left: 8px;   /* espaço entre estrela e ícone */
+  position: relative;
+}
+
+/* contorno opcional para destaque */
+.pontuacao-icon::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #b8860b; /* contorno dourado escuro */
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+
+
+/* BOTÃO VOLTAR */
+.botao-voltar {
+  background-color: #ec8533;
+  color: #000;
+  font-size: 1.3rem;
+  border: none;
+  border-radius: 20px;
+  padding: 15px 50px;
+  cursor: pointer;
+  margin-top: 30px;
+}
+
+.botao-voltar:hover {
+  background-color: #f5a64f;
+}
