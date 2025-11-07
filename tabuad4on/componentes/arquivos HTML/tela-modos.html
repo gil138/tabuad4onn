@@ -6,13 +6,15 @@
   <title>Modos - Tabuad4on</title>
   <link rel="stylesheet" href="../arquivos CSS/style-tela-modos.css">
   <style>
-    /* Deixa o ícone de ranking clicável */
-    .icone-ranking {
+    /* Deixa os ícones clicáveis */
+    .icone-ranking,
+    .icone-interrogacao {
       cursor: pointer;
       transition: transform 0.2s ease;
     }
 
-    .icone-ranking:hover {
+    .icone-ranking:hover,
+    .icone-interrogacao:hover {
       transform: scale(1.1);
     }
   </style>
@@ -30,7 +32,7 @@
       <span class="texto-modo">Fácil</span>
       <div class="icones">
         <img src="../arquivos CSS/ranking.png" alt="Ranking" class="icone-ranking" id="ranking-facil">
-        <img src="../arquivos CSS/interrogacao.png" alt="Interrogação" class="icone-interrogacao">
+        <img src="../arquivos CSS/interrogacao.png" alt="Ajuda" class="icone-interrogacao" id="ajuda-facil">
       </div>
     </div>
 
@@ -39,7 +41,7 @@
       <span class="texto-modo">Médio</span>
       <div class="icones">
         <img src="../arquivos CSS/ranking.png" alt="Ranking" class="icone-ranking" id="ranking-medio">
-        <img src="../arquivos CSS/interrogacao.png" alt="Interrogação" class="icone-interrogacao">
+        <img src="../arquivos CSS/interrogacao.png" alt="Ajuda" class="icone-interrogacao" id="ajuda-medio">
       </div>
     </div>
 
@@ -48,7 +50,7 @@
       <span class="texto-modo">Difícil</span>
       <div class="icones">
         <img src="../arquivos CSS/ranking.png" alt="Ranking" class="icone-ranking" id="ranking-dificil">
-        <img src="../arquivos CSS/interrogacao.png" alt="Interrogação" class="icone-interrogacao">
+        <img src="../arquivos CSS/interrogacao.png" alt="Ajuda" class="icone-interrogacao" id="ajuda-dificil">
       </div>
     </div>
 
@@ -57,7 +59,7 @@
       <span class="texto-modo">Customizado</span>
       <div class="icones">
         <img src="../arquivos CSS/ranking.png" alt="Ranking" class="icone-ranking" id="ranking-customizado">
-        <img src="../arquivos CSS/interrogacao.png" alt="Interrogação" class="icone-interrogacao">
+        <img src="../arquivos CSS/interrogacao.png" alt="Ajuda" class="icone-interrogacao" id="ajuda-customizado">
       </div>
     </div>
 
@@ -96,9 +98,28 @@
         window.location.href = "tela-de-pontuacao.html";
       });
     });
+
+    // Botões de interrogação → levam às telas de instrução específicas
+    document.getElementById("ajuda-facil").addEventListener("click", (event) => {
+      event.stopPropagation();
+      window.location.href = "tela-instrucao-facil.html";
+    });
+
+    document.getElementById("ajuda-medio").addEventListener("click", (event) => {
+      event.stopPropagation();
+      window.location.href = "tela-instrucao-medio.html";
+    });
+
+    document.getElementById("ajuda-dificil").addEventListener("click", (event) => {
+      event.stopPropagation();
+      window.location.href = "tela-instrucao-dificil.html";
+    });
+
+    document.getElementById("ajuda-customizado").addEventListener("click", (event) => {
+      event.stopPropagation();
+      window.location.href = "tela-instrucao-aprendizado.html";
+    });
   </script>
 
 </body>
 </html>
-
-
