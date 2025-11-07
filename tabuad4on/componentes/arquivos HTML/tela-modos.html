@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Modos - Tabuad4on</title>
   <link rel="stylesheet" href="../arquivos CSS/style-tela-modos.css">
+  <style>
+    /* Deixa o ícone de ranking clicável */
+    .icone-ranking {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .icone-ranking:hover {
+      transform: scale(1.1);
+    }
+  </style>
 </head>
 <body>
 
@@ -14,39 +25,80 @@
     <!-- TÍTULO -->
     <h1 class="titulo">Escolha um modo</h1>
 
-    <!-- MODO FÁCIL -->
-  <div class="modo">
-    <span class="texto-modo">Fácil</span>
-    <span class="pontuacao-icon"></span>
-    <div class="estrela">
-      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="estrela">
-    </div>
-  </div>
-
-
-    <!-- MODO DIFÍCIL -->
-    <div class="modo" id="modoDificil">
-      <span class="texto-modo">Difícil</span>
-      <div class="estrela">
-        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="estrela">
+    <!-- Modo Fácil -->
+    <div class="modo" id="modo-facil">
+      <span class="texto-modo">Fácil</span>
+      <div class="icones">
+        <img src="../arquivos CSS/ranking.png" alt="Ranking" class="icone-ranking" id="ranking-facil">
+        <img src="../arquivos CSS/interrogacao.png" alt="Interrogação" class="icone-interrogacao">
       </div>
     </div>
 
-    <!-- BOTÃO VOLTAR -->
-    <button class="botao-voltar" id="botaoVoltar">Teste</button>
+    <!-- Modo Médio -->
+    <div class="modo" id="modo-medio">
+      <span class="texto-modo">Médio</span>
+      <div class="icones">
+        <img src="../arquivos CSS/ranking.png" alt="Ranking" class="icone-ranking" id="ranking-medio">
+        <img src="../arquivos CSS/interrogacao.png" alt="Interrogação" class="icone-interrogacao">
+      </div>
+    </div>
+
+    <!-- Modo Difícil -->
+    <div class="modo" id="modo-dificil">
+      <span class="texto-modo">Difícil</span>
+      <div class="icones">
+        <img src="../arquivos CSS/ranking.png" alt="Ranking" class="icone-ranking" id="ranking-dificil">
+        <img src="../arquivos CSS/interrogacao.png" alt="Interrogação" class="icone-interrogacao">
+      </div>
+    </div>
+
+    <!-- Modo Customizado -->
+    <div class="modo" id="modo-customizado">
+      <span class="texto-modo">Customizado</span>
+      <div class="icones">
+        <img src="../arquivos CSS/ranking.png" alt="Ranking" class="icone-ranking" id="ranking-customizado">
+        <img src="../arquivos CSS/interrogacao.png" alt="Interrogação" class="icone-interrogacao">
+      </div>
+    </div>
+
+    <!-- Botão Voltar -->
+    <button id="botao-voltar" class="botao-voltar">Voltar</button>
   </div>
 
-  <!-- SCRIPT PARA VOLTAR -->
+  <!-- SCRIPT -->
   <script>
-    document.getElementById("botaoVoltar").addEventListener("click", () => {
+    // Botão Voltar → leva à tela inicial
+    document.getElementById("botao-voltar").addEventListener("click", () => {
       window.location.href = "tela-inicial.html";
     });
 
-    // Modo difícil
-    document.getElementById("modoDificil").addEventListener("click", () => {
-      window.location.href = "dificil.html";
+    // Modos de jogo
+    document.getElementById("modo-facil").addEventListener("click", () => {
+      window.location.href = "tela-questoes-facil.html";
+    });
+
+    document.getElementById("modo-medio").addEventListener("click", () => {
+      window.location.href = "tela-questoes-medio.html";
+    });
+
+    document.getElementById("modo-dificil").addEventListener("click", () => {
+      window.location.href = "tela-questoes-dificil.html";
+    });
+
+    document.getElementById("modo-customizado").addEventListener("click", () => {
+      window.location.href = "tela-questoes-customizadas.html";
+    });
+
+    // Botões de ranking → levam à tela de pontuação
+    document.querySelectorAll(".icone-ranking").forEach(icon => {
+      icon.addEventListener("click", (event) => {
+        event.stopPropagation(); // impede que o clique acione o modo
+        window.location.href = "tela-de-pontuacao.html";
+      });
     });
   </script>
 
 </body>
 </html>
+
+
