@@ -1,158 +1,97 @@
-html, body {
+/* RESET */
+* {
   margin: 0;
   padding: 0;
-  width: 100%;
-  height: 100%;
   box-sizing: border-box;
 }
 
+/* BODY */
 body {
+  font-family: 'Inter', sans-serif;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #1f1b5a;
-  font-family: "Inter", sans-serif;
+  background-color: #2E91D6;
+  position: relative;
   overflow: hidden;
 }
 
-/* Container principal */
+/* ESTRELAS */
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(#ffffff66 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0.4;
+}
+
+/* CONTAINER */
 .container {
   position: relative;
-  width: 90vw; /* 90% da largura da tela */
-  max-width: 1440px; /* limite máximo */
-  aspect-ratio: 1440 / 1024; /* mantém a proporção original */
-  background: #1f1b5a;
-  overflow: hidden;
-  border-radius: 0;
-}
-
-/* Estrelas de fundo */
-.estrela {
-  position: absolute;
-  background: url(https://design.penpot.app/assets/by-file-media-id/5b786374-066f-8104-8007-0cbfe2469a4c)
-    no-repeat center/cover;
-  opacity: 0.6;
-}
-
-.estrela1 {
-  left: -5%;
-  top: 50%;
-  width: 40%;
-  aspect-ratio: 1;
-}
-
-.estrela2 {
-  left: -10%;
-  top: -10%;
-  width: 45%;
-  aspect-ratio: 1;
-  transform: rotate(36deg);
-}
-
-.estrela3 {
-  left: 40%;
-  top: -15%;
-  width: 60%;
-  aspect-ratio: 1;
-}
-
-/* Moldura principal */
-.quadro-principal {
-  position: absolute;
-  left: 2%;
-  top: 5%;
-  width: 96%;
-  height: 90%;
-  background: #b55b17;
-  border-radius: 2vw;
-  padding: 1%;
-}
-
-/* Fundo interno */
-.fundo {
-  position: absolute;
-  left: 1%;
-  top: 1%;
-  width: 98%;
-  height: 98%;
-  background: url(https://design.penpot.app/assets/by-file-media-id/5b786374-066f-8104-8007-0cbfe2469a4a)
-    no-repeat center/cover;
-  border-radius: 5vw;
-  opacity: 0.8;
-}
-
-/* Molduras centrais */
-.borda-preta {
-  position: absolute;
-  left: 7%;
-  top: 28%;
-  width: 85%;
+  background-color: #fffaf3;
+  border-radius: 25px;
+  width: 75%;
+  max-width: 900px;
   height: 60%;
-  background: #000;
-  border-radius: 6vw;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  padding: 2rem;
+  text-align: center;
 }
 
-.borda-bege {
-  position: absolute;
-  left: 8.5%;
-  top: 29%;
-  width: 82%;
-  height: 58%;
-  background: #edebd1;
-  border-radius: 6vw;
-}
-
-/* Cabeçalho */
-.cabecalho {
-  position: absolute;
-  left: 24%;
-  top: 3%;
-  width: 50%;
-  height: 20%;
-  background: #e9cb56;
-  border-radius: 6vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
+/* TÍTULO */
 .titulo {
-  font-size: 8vw; /* responsivo */
-  color: #000;
-  margin: 0;
+  position: absolute;
+  top: -45px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fffaf3;
+  padding: 0.6rem 2rem;
+  border-radius: 20px;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #143a6d;
+  letter-spacing: 1px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* Botão VOLTAR */
-.botao-voltar {
+/* TEXTO */
+.texto {
+  color: #1a1a1a;
+  font-size: 1.2rem;
+  margin-top: 3rem;
+  line-height: 1.6;
+}
+
+#pontuacao {
+  display: block;
+  font-size: 3rem;
+  color: #143a6d;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+/* BOTÃO VOLTAR */
+.btn-voltar {
   position: absolute;
-  left: 40%;
-  bottom: 5%;
-  background: #ec8533;
-  border-radius: 3vw;
-  padding: 1vw 3vw;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #143a6d;
+  color: #fffaf3;
+  border: none;
+  padding: 12px 35px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 30px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
-.botao-voltar:hover {
-  background: #f39b5e;
-}
-
-.botao-voltar p {
-  margin: 0;
-  font-size: 3vw;
-  color: #000;
-}
-
-/* Rodapé */
-.rodape {
-  position: absolute;
-  bottom: 2%;
-  left: 3%;
-}
-
-.rodape p {
-  font-size: 1.2vw;
-  color: #fff;
-  margin: 0;
+.btn-voltar:hover {
+  background-color: #1d4e9e;
+  transform: translateX(-50%) scale(1.05);
 }
