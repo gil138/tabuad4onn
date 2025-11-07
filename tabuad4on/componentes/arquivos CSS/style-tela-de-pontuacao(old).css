@@ -9,6 +9,7 @@
 body {
   font-family: 'Inter', sans-serif;
   height: 100vh;
+  width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,7 +18,7 @@ body {
   overflow: hidden;
 }
 
-/* ESTRELAS */
+/* ESTRELAS DE FUNDO */
 body::before {
   content: "";
   position: absolute;
@@ -27,18 +28,25 @@ body::before {
   opacity: 0.4;
 }
 
-/* CONTAINER */
+/* CONTAINER PRINCIPAL */
 .container {
   position: relative;
   background-color: #fffaf3;
   border-radius: 25px;
-  width: 75%;
+  width: 90%;
   max-width: 900px;
+  min-width: 320px;
   height: 60%;
+  max-height: 500px;
+  min-height: 350px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
   z-index: 1;
   padding: 2rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 /* TÍTULO */
@@ -55,6 +63,7 @@ body::before {
   color: #143a6d;
   letter-spacing: 1px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
 }
 
 /* TEXTO */
@@ -73,12 +82,10 @@ body::before {
   font-weight: bold;
 }
 
-/* BOTÃO VOLTAR */
+/* BOTÕES */
 .btn-voltar {
   position: absolute;
   bottom: 25px;
-  left: 50%;
-  transform: translateX(-50%);
   background-color: #143a6d;
   color: #fffaf3;
   border: none;
@@ -93,5 +100,15 @@ body::before {
 
 .btn-voltar:hover {
   background-color: #1d4e9e;
-  transform: translateX(-50%) scale(1.05);
+  transform: scale(1.05);
+}
+
+/* BOTÃO ESQUERDO */
+#botao-voltarmodos {
+  left: 25px;
+}
+
+/* BOTÃO DIREITO */
+#botao-voltarinicial {
+  right: 25px;
 }
