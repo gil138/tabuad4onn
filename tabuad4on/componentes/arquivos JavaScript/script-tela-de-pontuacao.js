@@ -1,38 +1,56 @@
-// Função para voltar à tela inicial
+// === Função para voltar à tela inicial ===
 function voltarTelaInicial() {
-  window.location.href = "tela-inicial.html"; 
+  window.location.href = "tela-inicial.html";
 }
 
-// Função para voltar à tela de modos
+// === Função para voltar à tela de modos ===
 function voltarTelaModos() {
-  window.location.href = "tela-modos.html"; 
+  window.location.href = "tela-modos.html";
 }
 
-// Variável de pontuação
+// === Variável de pontuação ===
 let pontos = 0;
 
-// Função que calcula a pontuação com base no número de acertos
+// === Função que calcula a pontuação final (5 pontos por acerto) ===
 function calcularPontuacao() {
-  // Verifica se a variável global 'perguntasAcertadas' existe 
-  if (typeof window.perguntasAcertadas !== "undefined") {
-    pontos = window.perguntasAcertadas * 5;
+  // Primeiro tenta buscar a pontuação salva no localStorage
+  const pontuacaoSalva = localStorage.getItem("pontuacao");
+
+  let acertos = 0;
+
+  if (pontuacaoSalva !== null) {
+    acertos = parseInt(pontuacaoSalva);
+  } else if (typeof window.score !== "undefined") {
+    // fallback se a variável global ainda existir (mesma aba)
+    acertos = window.score;
   } else {
-    console.warn("Variável 'perguntasAcertadas' não encontrada!");
-    pontos = 0;
+    console.warn("⚠️ Nenhuma pontuação encontrada. Definindo como 0.");
   }
 
-  // Mostra o valor no HTML (no elemento com id="pontuacao")
+  // Calcula a pontuação total (5 pontos por acerto)
+  pontos = acertos * 5;
+
+  // Atualiza os elementos da tela, se existirem
   const pontuacaoElemento = document.getElementById("pontuacao");
   if (pontuacaoElemento) {
     pontuacaoElemento.textContent = pontos;
   }
+
+  const acertosElemento = document.getElementById("acertos");
+  if (acertosElemento) {
+    acertosElemento.textContent = acertos;
+  }
 }
 
-// Executa quando o conteúdo da página terminar de carregar
+// === Executa quando a página terminar de carregar ===
 window.addEventListener("DOMContentLoaded", () => {
-  calcularPontuacao();
+  // Só calcula a pontuação quando clicar no botão "Pontuação"
+  const botaoPontuacao = document.getElementById("botao-pontuacao");
+  if (botaoPontuacao) {
+    botaoPontuacao.addEventListener("click", calcularPontuacao);
+  }
 
-  // Adiciona a função de voltar aos botões
+  // === Adiciona eventos aos botões de navegação ===
   const botaoVoltarModos = document.getElementById("botao-voltarmodos");
   if (botaoVoltarModos) {
     botaoVoltarModos.addEventListener("click", voltarTelaModos);
@@ -42,4 +60,7 @@ window.addEventListener("DOMContentLoaded", () => {
   if (botaoVoltarInicial) {
     botaoVoltarInicial.addEventListener("click", voltarTelaInicial);
   }
+
+  // Também calcula automaticamente ao carregar a tela
+  calcularPontuacao();
 });
