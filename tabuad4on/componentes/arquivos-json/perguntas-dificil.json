@@ -1,0 +1,30 @@
+{
+    "perguntas": [
+        {
+            "pergunta": "3 + 4 = ?",
+            "opcoes": [1, 7, 9, 13],
+            "correta": 7
+        },
+        {
+            "pergunta": "9 - 6 = ?",
+            "opcoes": [3, 5, 1, 13],
+            "correta": 3
+        },
+        {
+            "pergunta": "10 + 4 = ?",
+            "opcoes": [5, 7, 2, 14],
+            "correta": 14
+        },
+        {
+            "pergunta": "7 + 3 = ?",
+            "opcoes": [8, 12, 5, 10],
+            "correta": 10
+        },
+        {
+            "pergunta": "9 - 8 = ?",
+            "opcoes": [1, 7, 3, 9],
+            "correta": 1
+        }
+    ]
+}
+    
