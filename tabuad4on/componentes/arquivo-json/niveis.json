@@ -1,0 +1,24 @@
+{
+  "modos": {
+    "facil": {
+      "operacoes": ["+", "-"],
+      "intervaloNumeros": [1, 10],
+      "totalPerguntas": 10
+    },
+    "medio": {
+      "operacoes": ["+", "-"],
+      "intervaloNumeros": [1, 30],
+      "totalPerguntas": 15
+    },
+    "dificil": {
+      "operacoes": ["+", "-", "*", "/"],
+      "intervaloNumeros": [1, 50],
+      "totalPerguntas": 20
+    },
+    "customizado": {
+      "operacoes": [],
+      "intervaloNumeros": [],
+      "totalPerguntas": null
+    }
+  }
+}
