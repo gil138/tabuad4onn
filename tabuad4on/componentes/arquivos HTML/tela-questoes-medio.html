@@ -207,6 +207,7 @@
     </style>
 </head>
 <body>
+    
     <div class="container">
         <h1>Tabuad4ON</h1>
         
@@ -431,7 +432,7 @@
             
             // Salva a pontuação globalmente e no localStorage
             window.score = score;
-            localStorage.setItem("pontuacao", score);
+            localStorage.setItem("pontuacao-medio", score);
             
             document.getElementById('restart-btn').addEventListener('click', sendBack);
             document.getElementById('score-btn').addEventListener('click', goToScore);
@@ -444,7 +445,7 @@
 
         // Ir para a tela de pontuação
         function goToScore() {
-            window.location.href = "tela-de-pontuacao.html";
+            window.location.href = "tela-de-pontuacao-medio.html";
         }
         
         // Inicializar o jogo
@@ -457,5 +458,10 @@
         // Iniciar o jogo quando a página carregar
         initGame();
     </script>
+    <script src="../arquivos JavaScript/script-musica.js"></script>
+      <script src="../arquivos JavaScript/script-brilho.js"></script>
+
 </body>
+
+
 </html>
