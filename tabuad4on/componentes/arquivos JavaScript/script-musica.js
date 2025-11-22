@@ -1,6 +1,6 @@
 // === Carregar música global ===
 if (!window.globalMusic) {
-    window.globalMusic = new Audio("../musica/musica de fundo.mpeg");
+    window.globalMusic = new Audio("../musica/musica_de_fundo.mp3");
     window.globalMusic.loop = true;
 
     const musicaAtiva = localStorage.getItem("musicaAtiva") !== "false";
