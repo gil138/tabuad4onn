@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabuad4ON - Radiciação</title>
+    <title>Tabuad4ON</title>
     <style>
         * {
             margin: 0;
@@ -155,21 +155,11 @@
             color: #6c757d;
             margin-top: 10px;
         }
-
-        .radical {
-            font-size: 32px;
-            vertical-align: middle;
-        }
-
-        .root-index {
-            font-size: 18px;
-            vertical-align: super;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Tabuad4ON - Radiciação</h1>
+        <h1>Tabuad4ON</h1>
         
         <div class="progress">
             <span id="question-count">Questão: 1/5</span>
@@ -180,7 +170,7 @@
         </div>
         
         <div class="question-container">
-            <div class="question" id="question-text">√25 = ?</div>
+            <div class="question" id="question-text">5 + 5 = ?</div>
             
             <div class="options" id="options-container">
                 <!-- As opções serão geradas dinamicamente -->
@@ -207,74 +197,19 @@
         const scoreValue = document.getElementById('score-value');
         const feedback = document.getElementById('feedback');
         
-        // Gerar perguntas de radiciação
+        // Gerar perguntas aleatórias
         function generateQuestions() {
             questions = [];
             for (let i = 0; i < totalQuestions; i++) {
-                // Aumenta a dificuldade gradualmente
-                const difficulty = 1 + i * difficultyIncrement;
-                
-                // Gera números para a radiciação
-                let base, radicand, correctAnswer;
-                const questionType = Math.floor(Math.random() * 3); // 0, 1 ou 2
-                
-                switch(questionType) {
-                    case 0: // Raiz quadrada simples
-                        base = Math.floor(Math.random() * 15 * difficulty) + 2;
-                        radicand = base * base;
-                        correctAnswer = base;
-                        break;
-                        
-                    case 1: // Raiz quadrada com números não exatos (opções próximas)
-                        base = Math.floor(Math.random() * 12 * difficulty) + 3;
-                        radicand = base * base;
-                        // Adiciona uma pequena variação para tornar mais interessante
-                        radicand += Math.random() > 0.7 ? Math.floor(Math.random() * 5) - 2 : 0;
-                        correctAnswer = Math.round(Math.sqrt(radicand));
-                        break;
-                        
-                    case 2: // Raiz cúbica (apenas para dificuldade maior)
-                        if (difficulty > 1.5) {
-                            base = Math.floor(Math.random() * 8 * (difficulty/2)) + 2;
-                            radicand = base * base * base;
-                            correctAnswer = base;
-                        } else {
-                            // Fallback para raiz quadrada se dificuldade baixa
-                            base = Math.floor(Math.random() * 10 * difficulty) + 2;
-                            radicand = base * base;
-                            correctAnswer = base;
-                        }
-                        break;
-                }
-                
-                // Garante que o radicand seja positivo
-                radicand = Math.max(1, radicand);
-                
-                // Formata a questão baseada no tipo
-                let question;
-                if (questionType === 2 && difficulty > 1.5) {
-                    question = `∛${radicand} = ?`;
-                } else {
-                    question = `√${radicand} = ?`;
-                }
+                const num1 = Math.floor(i/(difficultyIncrement * 20)) + Math.floor(Math.random() * 10 * (1 + i * difficultyIncrement)) + 1;
+                const num2 = Math.floor(i/(difficultyIncrement * 20)) + Math.floor(Math.random() * 10 * (1 + i * difficultyIncrement)) + 1;
+                const correctAnswer = num1 + num2;
                 
                 // Gerar opções de resposta
                 let options = [correctAnswer];
                 while (options.length < 4) {
-                    let randomOption;
-                    const variation = Math.floor(difficulty) + 1;
-                    
-                    if (Math.random() > 0.3) {
-                        // Opção próxima da correta
-                        randomOption = correctAnswer + Math.floor(Math.random() * variation * 2) - variation;
-                    } else {
-                        // Opção aleatória
-                        randomOption = Math.floor(Math.random() * 20 * difficulty) + 1;
-                    }
-                    
-                    // Garante que a opção seja positiva e diferente das outras
-                    randomOption = Math.max(1, randomOption);
-                    if (!options.includes(randomOption) && randomOption !== correctAnswer) {
+                    const randomOption = Math.floor(i/(difficultyIncrement * 20)) + Math.floor(Math.random() * 20 * (1 + i * 0.1)) + 1;
+                    if (!options.includes(randomOption)) {
                         options.push(randomOption);
                     }
                 }
@@ -283,10 +218,9 @@
                 options = options.sort(() => Math.random() - 0.5);
                 
                 questions.push({
-                    question: question,
+                    question: `${num1} + ${num2} = ?`,
                     options: options,
-                    correctAnswer: correctAnswer,
-                    radicand: radicand
+                    correctAnswer: correctAnswer
                 });
             }
         }
@@ -294,23 +228,13 @@
         // Exibir a pergunta atual
         function displayQuestion() {
             const q = questions[currentQuestion];
-            
-            // Formata a questão com símbolos matemáticos apropriados
-            let formattedQuestion;
-            if (q.question.includes('∛')) {
-                formattedQuestion = `<span class="radical"><span class="root-index">3</span>√${q.radicand}</span> = ?`;
-            } else {
-                formattedQuestion = `<span class="radical">√${q.radicand}</span> = ?`;
-            }
-            
-            questionText.innerHTML = formattedQuestion;
+            questionText.textContent = q.question;
             questionCount.textContent = `Questão: ${currentQuestion + 1}`;
             scoreValue.textContent = score;
             
             // Limpar opções anteriores
             optionsContainer.innerHTML = '';
             feedback.textContent = '';
-            feedback.className = 'feedback';
             
             // Adicionar novas opções
             q.options.forEach(option => {
@@ -343,18 +267,9 @@
                 score++;
                 scoreValue.textContent = score;
             } else {
-                wrongAnswers++;
+                wrongAnswers++
                 button.classList.add('incorrect');
-                
-                // Explicação da resposta
-                let explanation = '';
-                if (q.question.includes('∛')) {
-                    explanation = `Incorreto! A raiz cúbica de ${q.radicand} é ${q.correctAnswer} (${q.correctAnswer}³ = ${q.correctAnswer * q.correctAnswer * q.correctAnswer}).`;
-                } else {
-                    explanation = `Incorreto! A raiz quadrada de ${q.radicand} é ${q.correctAnswer} (${q.correctAnswer}² = ${q.correctAnswer * q.correctAnswer}).`;
-                }
-                
-                feedback.textContent = explanation;
+                feedback.textContent = `Incorreto! A resposta correta é ${q.correctAnswer}.`;
                 feedback.classList.add('incorrect');
             }
             
@@ -408,10 +323,9 @@
                     </div>
                 </div>
             `;
-            
-            // Salva a pontuação globalmente e no localStorage
-            window.score = score;
-            localStorage.setItem("pontuacao", score);
+                // Salva a pontuação globalmente e no localStorage
+    window.score = score;
+    localStorage.setItem("pontuacao", score);
             
             document.getElementById('restart-btn').addEventListener('click', sendBack);
             document.getElementById('score-btn').addEventListener('click', goToScore);
@@ -432,4 +346,3 @@
         displayQuestion();
     </script>
 </body>
-</html>

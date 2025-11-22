@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabuad4ON - Radiciação</title>
+    <title>Tabuad4ON</title>
     <style>
         * {
             margin: 0;
@@ -29,6 +29,7 @@
             max-width: 500px;
             padding: 30px;
             text-align: center;
+            position: relative;
         }
         
         h1 {
@@ -156,20 +157,58 @@
             margin-top: 10px;
         }
 
-        .radical {
-            font-size: 32px;
-            vertical-align: middle;
+        /* Barra de tempo */
+        .time-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            backdrop-filter: blur(10px);
         }
 
-        .root-index {
-            font-size: 18px;
-            vertical-align: super;
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .time-text {
+            font-weight: bold;
+        }
+
+        .time-bar-container {
+            width: 100%;
+            height: 12px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .time-bar {
+            height: 100%;
+            background-color: white;
+            border-radius: 6px;
+            transition: width 1s linear;
+            width: 100%;
+        }
+
+        .time-bar.warning {
+            background-color: #ffc107;
+        }
+
+        .time-bar.danger {
+            background-color: #dc3545;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Tabuad4ON - Radiciação</h1>
+        <h1>Tabuad4ON</h1>
         
         <div class="progress">
             <span id="question-count">Questão: 1/5</span>
@@ -180,13 +219,24 @@
         </div>
         
         <div class="question-container">
-            <div class="question" id="question-text">√25 = ?</div>
+            <div class="question" id="question-text">5 + 5 = ?</div>
             
             <div class="options" id="options-container">
                 <!-- As opções serão geradas dinamicamente -->
             </div>
             
             <div class="feedback" id="feedback"></div>
+        </div>
+    </div>
+
+    <!-- Barra de tempo -->
+    <div class="time-container">
+        <div class="time-info">
+            <span class="time-text">Tempo Restante:</span>
+            <span id="time-value">60s</span>
+        </div>
+        <div class="time-bar-container">
+            <div class="time-bar" id="time-bar"></div>
         </div>
     </div>
 
@@ -197,8 +247,11 @@
         let questions = [];
         const totalQuestions = 9999;
         let countdownInterval;
+        let countdownEndInterval;
         let wrongAnswers = 0;
         let difficultyIncrement = 0.05;
+        let timer = 120;
+        const initialTimer = timer; // Guarda o tempo inicial para a barra de progresso
         
         // Elementos do DOM
         const questionText = document.getElementById('question-text');
@@ -206,75 +259,37 @@
         const questionCount = document.getElementById('question-count');
         const scoreValue = document.getElementById('score-value');
         const feedback = document.getElementById('feedback');
+        const timeValue = document.getElementById('time-value');
+        const timeBar = document.getElementById('time-bar');
         
-        // Gerar perguntas de radiciação
+        // Atualizar a barra de tempo
+        function updateTimeBar() {
+            const percentage = (timer / initialTimer) * 100;
+            timeBar.style.width = `${percentage}%`;
+            timeValue.textContent = `${timer}s`;
+            
+            // Mudar cor conforme o tempo diminui
+            timeBar.classList.remove('warning', 'danger');
+            if (percentage <= 33) {
+                timeBar.classList.add('danger');
+            } else if (percentage <= 66) {
+                timeBar.classList.add('warning');
+            }
+        }
+        
+        // Gerar perguntas aleatórias
         function generateQuestions() {
             questions = [];
             for (let i = 0; i < totalQuestions; i++) {
-                // Aumenta a dificuldade gradualmente
-                const difficulty = 1 + i * difficultyIncrement;
-                
-                // Gera números para a radiciação
-                let base, radicand, correctAnswer;
-                const questionType = Math.floor(Math.random() * 3); // 0, 1 ou 2
-                
-                switch(questionType) {
-                    case 0: // Raiz quadrada simples
-                        base = Math.floor(Math.random() * 15 * difficulty) + 2;
-                        radicand = base * base;
-                        correctAnswer = base;
-                        break;
-                        
-                    case 1: // Raiz quadrada com números não exatos (opções próximas)
-                        base = Math.floor(Math.random() * 12 * difficulty) + 3;
-                        radicand = base * base;
-                        // Adiciona uma pequena variação para tornar mais interessante
-                        radicand += Math.random() > 0.7 ? Math.floor(Math.random() * 5) - 2 : 0;
-                        correctAnswer = Math.round(Math.sqrt(radicand));
-                        break;
-                        
-                    case 2: // Raiz cúbica (apenas para dificuldade maior)
-                        if (difficulty > 1.5) {
-                            base = Math.floor(Math.random() * 8 * (difficulty/2)) + 2;
-                            radicand = base * base * base;
-                            correctAnswer = base;
-                        } else {
-                            // Fallback para raiz quadrada se dificuldade baixa
-                            base = Math.floor(Math.random() * 10 * difficulty) + 2;
-                            radicand = base * base;
-                            correctAnswer = base;
-                        }
-                        break;
-                }
-                
-                // Garante que o radicand seja positivo
-                radicand = Math.max(1, radicand);
-                
-                // Formata a questão baseada no tipo
-                let question;
-                if (questionType === 2 && difficulty > 1.5) {
-                    question = `∛${radicand} = ?`;
-                } else {
-                    question = `√${radicand} = ?`;
-                }
+                const num1 = Math.floor(i/(difficultyIncrement * 20)) + Math.floor(Math.random() * 10 * (1 + i * difficultyIncrement)) + 1;
+                const num2 = Math.floor(i/(difficultyIncrement * 20)) + Math.floor(Math.random() * 10 * (1 + i * difficultyIncrement)) + 1;
+                const correctAnswer = num1 + num2;
                 
                 // Gerar opções de resposta
                 let options = [correctAnswer];
                 while (options.length < 4) {
-                    let randomOption;
-                    const variation = Math.floor(difficulty) + 1;
-                    
-                    if (Math.random() > 0.3) {
-                        // Opção próxima da correta
-                        randomOption = correctAnswer + Math.floor(Math.random() * variation * 2) - variation;
-                    } else {
-                        // Opção aleatória
-                        randomOption = Math.floor(Math.random() * 20 * difficulty) + 1;
-                    }
-                    
-                    // Garante que a opção seja positiva e diferente das outras
-                    randomOption = Math.max(1, randomOption);
-                    if (!options.includes(randomOption) && randomOption !== correctAnswer) {
+                    const randomOption = Math.floor(i/(difficultyIncrement * 20)) + Math.floor(Math.random() * 20 * (1 + i * 0.1)) + 1;
+                    if (!options.includes(randomOption)) {
                         options.push(randomOption);
                     }
                 }
@@ -283,10 +298,9 @@
                 options = options.sort(() => Math.random() - 0.5);
                 
                 questions.push({
-                    question: question,
+                    question: `${num1} + ${num2} = ?`,
                     options: options,
-                    correctAnswer: correctAnswer,
-                    radicand: radicand
+                    correctAnswer: correctAnswer
                 });
             }
         }
@@ -294,23 +308,13 @@
         // Exibir a pergunta atual
         function displayQuestion() {
             const q = questions[currentQuestion];
-            
-            // Formata a questão com símbolos matemáticos apropriados
-            let formattedQuestion;
-            if (q.question.includes('∛')) {
-                formattedQuestion = `<span class="radical"><span class="root-index">3</span>√${q.radicand}</span> = ?`;
-            } else {
-                formattedQuestion = `<span class="radical">√${q.radicand}</span> = ?`;
-            }
-            
-            questionText.innerHTML = formattedQuestion;
+            questionText.textContent = q.question;
             questionCount.textContent = `Questão: ${currentQuestion + 1}`;
             scoreValue.textContent = score;
             
             // Limpar opções anteriores
             optionsContainer.innerHTML = '';
             feedback.textContent = '';
-            feedback.className = 'feedback';
             
             // Adicionar novas opções
             q.options.forEach(option => {
@@ -343,18 +347,9 @@
                 score++;
                 scoreValue.textContent = score;
             } else {
-                wrongAnswers++;
+                wrongAnswers++
                 button.classList.add('incorrect');
-                
-                // Explicação da resposta
-                let explanation = '';
-                if (q.question.includes('∛')) {
-                    explanation = `Incorreto! A raiz cúbica de ${q.radicand} é ${q.correctAnswer} (${q.correctAnswer}³ = ${q.correctAnswer * q.correctAnswer * q.correctAnswer}).`;
-                } else {
-                    explanation = `Incorreto! A raiz quadrada de ${q.radicand} é ${q.correctAnswer} (${q.correctAnswer}² = ${q.correctAnswer * q.correctAnswer}).`;
-                }
-                
-                feedback.textContent = explanation;
+                feedback.textContent = `Incorreto! A resposta correta é ${q.correctAnswer}.`;
                 feedback.classList.add('incorrect');
             }
             
@@ -362,9 +357,9 @@
             startCountdown();
         }
         
-        // Iniciar contagem regressiva
+        // Iniciar contagem regressiva para passar de questao
         function startCountdown() {
-            let countdown = 2;
+            let countdown = 0.5;
             
             // Limpar qualquer intervalo anterior
             if (countdownInterval) {
@@ -380,10 +375,31 @@
                 }
             }, 1000);
         }
+
+        // Iniciar contagem regressiva para acabar o jogo
+        function startEndCountdown() {
+            // Limpar qualquer intervalo anterior
+            if (countdownEndInterval) {
+                clearInterval(countdownEndInterval);
+            }
+            
+            // Atualizar a barra de tempo imediatamente
+            updateTimeBar();
+            
+            countdownEndInterval = setInterval(() => {
+                timer--;
+                updateTimeBar();
+                
+                if (timer <= 0) {
+                    clearInterval(countdownEndInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
         
         // Navegar para a próxima pergunta
         function nextQuestion() {
-            if (wrongAnswers <= 0) {
+            if (wrongAnswers <= 0 && timer > 0) {
                 currentQuestion++;
                 displayQuestion();
             } else {
@@ -394,6 +410,7 @@
         
         // Finalizar o jogo
         function endGame() {
+            clearInterval(countdownEndInterval);
             const container = document.querySelector('.container');
             container.innerHTML = `
                 <div class="game-over">
@@ -408,6 +425,9 @@
                     </div>
                 </div>
             `;
+            
+            // Esconder a barra de tempo
+            document.querySelector('.time-container').style.display = 'none';
             
             // Salva a pontuação globalmente e no localStorage
             window.score = score;
@@ -428,8 +448,14 @@
         }
         
         // Inicializar o jogo
-        generateQuestions();
-        displayQuestion();
+        function initGame() {
+            generateQuestions();
+            displayQuestion();
+            startEndCountdown(); // Iniciar a contagem regressiva do tempo total
+        }
+        
+        // Iniciar o jogo quando a página carregar
+        initGame();
     </script>
 </body>
 </html>
