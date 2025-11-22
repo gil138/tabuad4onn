@@ -1,0 +1,89 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* BODY */
+body {
+  font-family: 'Inter', sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #2E91D6; /* Fundo azul */
+  position: relative;
+  overflow: hidden;
+}
+
+/* ESTRELAS DE FUNDO */
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(#ffffff66 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0.4;
+}
+
+/* CONTAINER PRINCIPAL */
+.container {
+  position: relative;
+  background-color: #fffaf3;
+  border-radius: 25px;
+  width: 75%;
+  max-width: 900px;
+  height: 60%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* TÍTULO SUPERIOR */
+.titulo {
+  position: absolute;
+  top: -45px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fffaf3;
+  padding: 0.6rem 2rem;
+  border-radius: 20px;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #143a6d;
+  letter-spacing: 1px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* TEXTO DENTRO DO QUADRO */
+.texto {
+  color: #1a1a1a;
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  line-height: 1.6;
+}
+
+/* BOTÃO VOLTAR */
+.btn-voltar {
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #143a6d;
+  color: #fffaf3;
+  border: none;
+  padding: 12px 35px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-voltar:hover {
+  background-color: #1d4e9e;
+  transform: translateX(-50%) scale(1.05);
+}
