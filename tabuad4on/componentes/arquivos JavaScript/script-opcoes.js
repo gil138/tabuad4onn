@@ -1,41 +1,60 @@
-// ======== SOM ========
-const botaoSom = document.getElementById("botaoSom");
-let somAtivo = true;
+// CONTROLE DO SOM (MÚSICA GLOBAL) 
+document.addEventListener("DOMContentLoaded", () => {
+    const botaoSom = document.getElementById("botaoSom");
+    if (!botaoSom) return;
 
-botaoSom.addEventListener("click", () => {
-  somAtivo = !somAtivo;
-  botaoSom.classList.toggle("ativo");
-  botaoSom.textContent = somAtivo ? "🔊" : "🔇";
-  localStorage.setItem("somAtivo", somAtivo);
+    // Atualiza visual inicial
+    const musicaAtiva = localStorage.getItem("musicaAtiva") === "true";
+    botaoSom.textContent = musicaAtiva ? "🔊" : "🔇";
+
+    botaoSom.addEventListener("click", () => {
+        const music = window.globalMusic;
+        if (!music) return;
+
+        if (music.paused) {
+            music.play();
+            localStorage.setItem("musicaAtiva", "true");
+            botaoSom.textContent = "🔊";
+        } else {
+            music.pause();
+            localStorage.setItem("musicaAtiva", "false");
+            botaoSom.textContent = "🔇";
+        }
+    });
 });
 
-// ======== BRILHO ========
+// CONTROLE DE BRILHO
 const controleBrilho = document.getElementById("controleBrilho");
 
 controleBrilho.addEventListener("input", () => {
-  const brilho = controleBrilho.value;
-  document.body.style.filter = `brightness(${brilho})`;
-  localStorage.setItem("brilhoTela", brilho);
+    const brilho = controleBrilho.value;
+    document.body.style.filter = `brightness(${brilho})`;
+    localStorage.setItem("brilhoTela", brilho);
 });
 
 // Carrega configurações salvas
 window.addEventListener("load", () => {
-  const somSalvo = localStorage.getItem("somAtivo");
-  const brilhoSalvo = localStorage.getItem("brilhoTela");
+    const brilhoSalvo = localStorage.getItem("brilhoTela");
+    const botaoSom = document.getElementById("botaoSom");
 
-  if (somSalvo !== null) {
-    somAtivo = somSalvo === "true";
-    botaoSom.classList.toggle("ativo", somAtivo);
-    botaoSom.textContent = somAtivo ? "🔊" : "🔇";
-  }
+    if (brilhoSalvo !== null) {
+        controleBrilho.value = brilhoSalvo;
+        document.body.style.filter = `brightness(${brilhoSalvo})`;
+    }
 
-  if (brilhoSalvo !== null) {
-    controleBrilho.value = brilhoSalvo;
-    document.body.style.filter = `brightness(${brilhoSalvo})`;
-  }
+    // Atualiza o botão de som se existir
+    if (botaoSom) {
+        const musicaAtiva = localStorage.getItem("musicaAtiva") === "true";
+        botaoSom.textContent = musicaAtiva ? "🔊" : "🔇";
+    }
 });
 
-// ======== VOLTAR ========
+//  VOLTAR 
 document.getElementById("botaoVoltar").addEventListener("click", () => {
-  window.location.href = "tela-inicial.html";
+    window.location.href = "tela-inicial.html";
 });
+
+
+
+
+
