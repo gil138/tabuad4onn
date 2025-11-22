@@ -31,10 +31,10 @@ body::before {
 .container {
   position: relative;
   background-color: #fffaf3;
-  border-radius: 25px;
+  border-radius: 40px;
   width: 75%;
   max-width: 900px;
-  height: 60%;
+  height: 85%;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
   z-index: 1;
   padding: 2rem;
