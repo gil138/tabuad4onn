@@ -191,247 +191,247 @@
         </div>
     </div>
 
-    <script>
-        // Variáveis do jogo
-        let currentQuestion = 0;
-        let score = 0;
-        let questions = [];
-        const totalQuestions = 9999;
-        let countdownInterval;
-        let wrongAnswers = 0;
-        let difficultyIncrement = 0.05;
-        
-        // Elementos do DOM
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const questionCount = document.getElementById('question-count');
-        const scoreValue = document.getElementById('score-value');
-        const feedback = document.getElementById('feedback');
-        
-        // Gerar perguntas de radiciação
-        function generateQuestions() {
-            questions = [];
-            for (let i = 0; i < totalQuestions; i++) {
-                // Aumenta a dificuldade gradualmente
-                const difficulty = 1 + i * difficultyIncrement;
-                
-                // Gera números para a radiciação
-                let base, radicand, correctAnswer;
-                const questionType = Math.floor(Math.random() * 3); // 0, 1 ou 2
-                
-                switch(questionType) {
-                    case 0: // Raiz quadrada simples
-                        base = Math.floor(Math.random() * 15 * difficulty) + 2;
-                        radicand = base * base;
-                        correctAnswer = base;
-                        break;
-                        
-                    case 1: // Raiz quadrada com números não exatos (opções próximas)
-                        base = Math.floor(Math.random() * 12 * difficulty) + 3;
-                        radicand = base * base;
-                        // Adiciona uma pequena variação para tornar mais interessante
-                        radicand += Math.random() > 0.7 ? Math.floor(Math.random() * 5) - 2 : 0;
-                        correctAnswer = Math.round(Math.sqrt(radicand));
-                        break;
-                        
-                    case 2: // Raiz cúbica (apenas para dificuldade maior)
-                        if (difficulty > 1.5) {
-                            base = Math.floor(Math.random() * 8 * (difficulty/2)) + 2;
-                            radicand = base * base * base;
-                            correctAnswer = base;
-                        } else {
-                            // Fallback para raiz quadrada se dificuldade baixa
-                            base = Math.floor(Math.random() * 10 * difficulty) + 2;
-                            radicand = base * base;
-                            correctAnswer = base;
-                        }
-                        break;
-                }
-                
-                // Garante que o radicand seja positivo
-                radicand = Math.max(1, radicand);
-                
-                // Formata a questão baseada no tipo
-                let question;
-                if (questionType === 2 && difficulty > 1.5) {
-                    question = `∛${radicand} = ?`;
-                } else {
-                    question = `√${radicand} = ?`;
-                }
-                
-                // Gerar opções de resposta
-                let options = [correctAnswer];
-                while (options.length < 4) {
-                    let randomOption;
-                    const variation = Math.floor(difficulty) + 1;
-                    
-                    if (Math.random() > 0.3) {
-                        // Opção próxima da correta
-                        randomOption = correctAnswer + Math.floor(Math.random() * variation * 2) - variation;
-                    } else {
-                        // Opção aleatória
-                        randomOption = Math.floor(Math.random() * 20 * difficulty) + 1;
-                    }
-                    
-                    // Garante que a opção seja positiva e diferente das outras
-                    randomOption = Math.max(1, randomOption);
-                    if (!options.includes(randomOption) && randomOption !== correctAnswer) {
-                        options.push(randomOption);
-                    }
-                }
-                
-                // Embaralhar as opções
-                options = options.sort(() => Math.random() - 0.5);
-                
-                questions.push({
-                    question: question,
-                    options: options,
-                    correctAnswer: correctAnswer,
-                    radicand: radicand
-                });
-            }
-        }
-        
-        // Exibir a pergunta atual
-        function displayQuestion() {
-            const q = questions[currentQuestion];
-            
-            // Formata a questão com símbolos matemáticos apropriados
-            let formattedQuestion;
-            if (q.question.includes('∛')) {
-                formattedQuestion = `<span class="radical"><span class="root-index">3</span>√${q.radicand}</span> = ?`;
-            } else {
-                formattedQuestion = `<span class="radical">√${q.radicand}</span> = ?`;
-            }
-            
-            questionText.innerHTML = formattedQuestion;
-            questionCount.textContent = `Questão: ${currentQuestion + 1}`;
-            scoreValue.textContent = score;
-            
-            // Limpar opções anteriores
-            optionsContainer.innerHTML = '';
-            feedback.textContent = '';
-            feedback.className = 'feedback';
-            
-            // Adicionar novas opções
-            q.options.forEach(option => {
-                const button = document.createElement('button');
-                button.className = 'option';
-                button.textContent = option;
-                button.addEventListener('click', () => checkAnswer(option, button));
-                optionsContainer.appendChild(button);
-            });
-        }
-        
-        // Verificar resposta
-        function checkAnswer(selectedOption, button) {
-            const q = questions[currentQuestion];
-            
-            // Desabilitar todos os botões de opção
-            const optionButtons = document.querySelectorAll('.option');
-            optionButtons.forEach(btn => {
-                btn.disabled = true;
-                if (parseInt(btn.textContent) === q.correctAnswer) {
-                    btn.classList.add('correct');
-                }
-            });
-            
-            // Verificar se a resposta está correta
-            if (selectedOption === q.correctAnswer) {
-                button.classList.add('correct');
-                feedback.textContent = 'Correto!';
-                feedback.classList.add('correct');
-                score++;
-                scoreValue.textContent = score;
-            } else {
-                wrongAnswers++;
-                button.classList.add('incorrect');
-                
-                // Explicação da resposta
-                let explanation = '';
-                if (q.question.includes('∛')) {
-                    explanation = `Incorreto! A raiz cúbica de ${q.radicand} é ${q.correctAnswer} (${q.correctAnswer}³ = ${q.correctAnswer * q.correctAnswer * q.correctAnswer}).`;
-                } else {
-                    explanation = `Incorreto! A raiz quadrada de ${q.radicand} é ${q.correctAnswer} (${q.correctAnswer}² = ${q.correctAnswer * q.correctAnswer}).`;
-                }
-                
-                feedback.textContent = explanation;
-                feedback.classList.add('incorrect');
-            }
-            
-            // Iniciar contagem regressiva para próxima pergunta
-            startCountdown();
-        }
-        
-        // Iniciar contagem regressiva
-        function startCountdown() {
-            let countdown = 2;
-            
-            // Limpar qualquer intervalo anterior
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-            }
-            
-            countdownInterval = setInterval(() => {
-                countdown--;
-                
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    nextQuestion();
-                }
-            }, 1000);
-        }
-        
-        // Navegar para a próxima pergunta
-        function nextQuestion() {
-            if (wrongAnswers <= 0) {
-                currentQuestion++;
-                displayQuestion();
-            } else {
-                // Fim do jogo
-                endGame();
-            }
-        }
-        
-        // Finalizar o jogo
-        function endGame() {
-            const container = document.querySelector('.container');
-            container.innerHTML = `
-                <div class="game-over">
-                    <h1>Fim do Jogo!</h1>
-                    <div class="score" style="font-size: 24px; margin: 20px 0;">
-                        Sua pontuação final: ${score}
-                    </div>
-                    <p>Obrigado por jogar!</p>
-                    <div class="button-group">
-                        <button class="restart-btn" id="restart-btn">Voltar</button>
-                        <button class="score-btn" id="score-btn">Pontuação</button>
-                    </div>
-                </div>
-            `;
-            
-            // Salva a pontuação globalmente e no localStorage
-            window.score = score;
-            localStorage.setItem("pontuacao-dificil", score);
-            
-            document.getElementById('restart-btn').addEventListener('click', sendBack);
-            document.getElementById('score-btn').addEventListener('click', goToScore);
-        }
-        
-        // Voltar para a tela inicial
-        function sendBack() {
-            window.location.href = "tela-inicial.html";
-        }
+<script>
+    // Variáveis do jogo
+    let currentQuestion = 0;
+    let score = 0;
+    let questions = [];
+    let countdownInterval;
+    let wrongAnswers = 0;
+    let difficultyIncrement = 0.05;
 
-        // Ir para a tela de pontuação
-        function goToScore() {
-            window.location.href = "tela-de-pontuacao-dificil.html";
+    // Elementos do DOM
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const questionCount = document.getElementById('question-count');
+    const scoreValue = document.getElementById('score-value');
+    const feedback = document.getElementById('feedback');
+
+    fetch("../arquivo-json/niveis.json")
+        .then(res => res.json())
+        .then(json => {
+            const modo = json.modos.dificil;
+
+            generateQuestionsFromJSON(modo);
+            displayQuestion();
+        })
+        .catch(err => console.error("Erro ao carregar JSON:", err));
+
+    function generateQuestionsFromJSON(config) {
+
+        const tipos = config.tiposQuestoes;  
+        const usarProgressao = config.usaDificuldadeProgressiva;
+        const inc = config.difficultyIncrement ?? 0.05;
+        difficultyIncrement = inc;
+
+        const intervalos = config.intervalosBase;
+        const variacao = config.variaçãoRadicando;
+        const total = config.totalPerguntas;
+
+        questions = [];
+
+        for (let i = 0; i < total; i++) {
+
+            const difficulty = usarProgressao ? 1 + i * difficultyIncrement : 1;
+
+            const tipo = tipos[Math.floor(Math.random() * tipos.length)];
+
+            let base, radicand, correctAnswer;
+
+            //Raiz Quadrada
+            if (tipo === "raiz_quadrada") {
+                const [min, max] = intervalos.raiz_quadrada;
+                base = randomInt(min, max * difficulty);
+                radicand = base * base;
+                correctAnswer = base;
+            }
+
+            //Raiz Quadrada Aproximada
+            if (tipo === "raiz_quadrada_aproximada") {
+                const [min, max] = intervalos.raiz_quadrada_aproximada;
+                base = randomInt(min, max * difficulty);
+                radicand = base * base;
+
+                if (Math.random() < variacao.chance) {
+                    radicand += randomInt(-variacao.valorMaximo, variacao.valorMaximo);
+                }
+
+                radicand = Math.max(1, radicand);  
+                correctAnswer = Math.round(Math.sqrt(radicand));
+            }
+
+            //Raiz Cúbica
+            if (tipo === "raiz_cubica") {
+                const [min, max] = intervalos.raiz_cubica;
+                base = randomInt(min, max * difficulty);
+                radicand = base * base * base;
+                correctAnswer = base;
+            }
+
+            //Monta o texto da questão
+            let questionTextFinal = (tipo === "raiz_cubica")
+                ? `∛${radicand} = ?`
+                : `√${radicand} = ?`;
+
+            //Gerar opções
+            let options = [correctAnswer];
+
+            while (options.length < 4) {
+                let variation = Math.floor(difficulty) + 1;
+
+                let randomOption;
+
+                if (Math.random() > 0.3) {
+                    randomOption = correctAnswer + randomInt(-variation, variation);
+                } else {
+                    randomOption = randomInt(1, 20 * difficulty);
+                }
+
+                randomOption = Math.max(1, randomOption);
+
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
+                }
+            }
+
+            options = options.sort(() => Math.random() - 0.5);
+
+            questions.push({
+                question: questionTextFinal,
+                options: options,
+                correctAnswer: correctAnswer,
+                radicand: radicand
+            });
+        }
+    }
+
+    // Função auxiliar
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+
+    function displayQuestion() {
+        const q = questions[currentQuestion];
+        
+        let formattedQuestion;
+        if (q.question.includes('∛')) {
+            formattedQuestion = `<span class="radical"><span class="root-index">3</span>√${q.radicand}</span> = ?`;
+        } else {
+            formattedQuestion = `<span class="radical">√${q.radicand}</span> = ?`;
         }
         
-        // Inicializar o jogo
-        generateQuestions();
-        displayQuestion();
-    </script>
+        questionText.innerHTML = formattedQuestion;
+        questionCount.textContent = `Questão: ${currentQuestion + 1}`;
+        scoreValue.textContent = score;
+        
+        optionsContainer.innerHTML = '';
+        feedback.textContent = '';
+        feedback.className = 'feedback';
+        
+        q.options.forEach(option => {
+            const button = document.createElement('button');
+            button.className = 'option';
+            button.textContent = option;
+            button.addEventListener('click', () => checkAnswer(option, button));
+            optionsContainer.appendChild(button);
+        });
+    }
+
+    function checkAnswer(selectedOption, button) {
+        const q = questions[currentQuestion];
+        
+        const optionButtons = document.querySelectorAll('.option');
+        optionButtons.forEach(btn => {
+            btn.disabled = true;
+            if (parseInt(btn.textContent) === q.correctAnswer) {
+                btn.classList.add('correct');
+            }
+        });
+        
+        if (selectedOption === q.correctAnswer) {
+            button.classList.add('correct');
+            feedback.textContent = 'Correto!';
+            feedback.classList.add('correct');
+            score++;
+            scoreValue.textContent = score;
+        } else {
+            wrongAnswers++;
+            button.classList.add('incorrect');
+            
+            let explanation = '';
+            if (q.question.includes('∛')) {
+                explanation = `Incorreto! A raiz cúbica de ${q.radicand} é ${q.correctAnswer} (${q.correctAnswer}³ = ${q.correctAnswer ** 3}).`;
+            } else {
+                explanation = `Incorreto! A raiz quadrada de ${q.radicand} é ${q.correctAnswer} (${q.correctAnswer}² = ${q.correctAnswer ** 2}).`;
+            }
+            
+            feedback.textContent = explanation;
+            feedback.classList.add('incorrect');
+        }
+        
+        startCountdown();
+    }
+
+    function startCountdown() {
+        let countdown = 2;
+        
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+        }
+        
+        countdownInterval = setInterval(() => {
+            countdown--;
+            
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function nextQuestion() {
+        if (wrongAnswers <= 0) {
+            currentQuestion++;
+            displayQuestion();
+        } else {
+            endGame();
+        }
+    }
+
+    function endGame() {
+        const container = document.querySelector('.container');
+        container.innerHTML = `
+            <div class="game-over">
+                <h1>Fim do Jogo!</h1>
+                <div class="score" style="font-size: 24px; margin: 20px 0;">
+                    Sua pontuação final: ${score}
+                </div>
+                <p>Obrigado por jogar!</p>
+                <div class="button-group">
+                    <button class="restart-btn" id="restart-btn">Voltar</button>
+                    <button class="score-btn" id="score-btn">Pontuação</button>
+                </div>
+            </div>
+        `;
+        
+        window.score = score;
+        localStorage.setItem("pontuacao-dificil", score);
+        
+        document.getElementById('restart-btn').addEventListener('click', sendBack);
+        document.getElementById('score-btn').addEventListener('click', goToScore);
+    }
+
+    function sendBack() {
+        window.location.href = "tela-inicial.html";
+    }
+
+    function goToScore() {
+        window.location.href = "tela-de-pontuacao-dificil.html";
+    }
+
+</script>
+
 
     <script src="../arquivos JavaScript/script-musica.js"></script>
       <script src="../arquivos JavaScript/script-brilho.js"></script>
