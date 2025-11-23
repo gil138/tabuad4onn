@@ -241,223 +241,253 @@
         </div>
     </div>
 
-    <script>
-        // Variáveis do jogo
-        let currentQuestion = 0;
-        let score = 0;
-        let questions = [];
-        const totalQuestions = 9999;
-        let countdownInterval;
-        let countdownEndInterval;
-        let wrongAnswers = 0;
-        let difficultyIncrement = 0.05;
-        let timer = 120;
-        const initialTimer = timer; // Guarda o tempo inicial para a barra de progresso
-        
-        // Elementos do DOM
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const questionCount = document.getElementById('question-count');
-        const scoreValue = document.getElementById('score-value');
-        const feedback = document.getElementById('feedback');
-        const timeValue = document.getElementById('time-value');
-        const timeBar = document.getElementById('time-bar');
-        
-        // Atualizar a barra de tempo
-        function updateTimeBar() {
-            const percentage = (timer / initialTimer) * 100;
-            timeBar.style.width = `${percentage}%`;
-            timeValue.textContent = `${timer}s`;
-            
-            // Mudar cor conforme o tempo diminui
-            timeBar.classList.remove('warning', 'danger');
-            if (percentage <= 33) {
-                timeBar.classList.add('danger');
-            } else if (percentage <= 66) {
-                timeBar.classList.add('warning');
-            }
+<script>
+
+    fetch("../arquivo-json/niveis.json")
+        .then(response => response.json())
+        .then(data => {
+            config = data;
+
+            modoSelecionado = config.modos.medio;
+
+            initGame();
+        })
+        .catch(error => {
+            console.error("Erro ao carregar o JSON:", error);
+        });
+
+
+    let currentQuestion = 0;
+    let score = 0;
+    let questions = [];
+    const totalQuestions = 9999;
+    let countdownInterval;
+    let countdownEndInterval;
+    let wrongAnswers = 0;
+    let difficultyIncrement = 0.05;
+    let timer = 120;
+    const initialTimer = timer;
+
+
+    // ELEMENTOS DO DOM
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const questionCount = document.getElementById('question-count');
+    const scoreValue = document.getElementById('score-value');
+    const feedback = document.getElementById('feedback');
+    const timeValue = document.getElementById('time-value');
+    const timeBar = document.getElementById('time-bar');
+
+
+
+    // ATUALIZAR BARRA DE TEMPO
+    function updateTimeBar() {
+        const percentage = (timer / initialTimer) * 100;
+        timeBar.style.width = `${percentage}%`;
+        timeValue.textContent = `${timer}s`;
+
+        timeBar.classList.remove('warning', 'danger');
+        if (percentage <= 33) {
+            timeBar.classList.add('danger');
+        } else if (percentage <= 66) {
+            timeBar.classList.add('warning');
         }
-        
-        // Gerar perguntas aleatórias
-        function generateQuestions() {
-            questions = [];
-            for (let i = 0; i < totalQuestions; i++) {
-                const num1 = Math.floor(i/(difficultyIncrement * 20)) + Math.floor(Math.random() * 10 * (1 + i * difficultyIncrement)) + 1;
-                const num2 = Math.floor(i/(difficultyIncrement * 20)) + Math.floor(Math.random() * 10 * (1 + i * difficultyIncrement)) + 1;
-                const correctAnswer = num1 + num2;
-                
-                // Gerar opções de resposta
-                let options = [correctAnswer];
-                while (options.length < 4) {
-                    const randomOption = Math.floor(i/(difficultyIncrement * 20)) + Math.floor(Math.random() * 20 * (1 + i * 0.1)) + 1;
-                    if (!options.includes(randomOption)) {
-                        options.push(randomOption);
-                    }
+    }
+
+
+    // GERAR PERGUNTAS USANDO O MODO MÉDIO DO JSON
+    function generateQuestions() {
+
+        const intervalo = modoSelecionado.intervaloNumeros;
+        const operacoes = modoSelecionado.operacoes;   // ["+", "-"]
+        const totalPerguntas = modoSelecionado.totalPerguntas;
+
+        questions = [];
+
+        for (let i = 0; i < totalPerguntas; i++) {
+
+            const num1 = Math.floor(Math.random() * (intervalo[1] - intervalo[0] + 1)) + intervalo[0];
+            const num2 = Math.floor(Math.random() * (intervalo[1] - intervalo[0] + 1)) + intervalo[0];
+
+            // Sorteia operação (+ ou -)
+            const operation = operacoes[Math.floor(Math.random() * operacoes.length)];
+
+            let correctAnswer = 0;
+
+            if (operation === "+") correctAnswer = num1 + num2;
+            if (operation === "-") correctAnswer = num1 - num2;
+
+            const questionTextFormat = `${num1} ${operation} ${num2} = ?`;
+
+            let options = [correctAnswer];
+
+            while (options.length < 4) {
+                let randomOption = Math.floor(Math.random() * (intervalo[1] - intervalo[0] + 1)) + intervalo[0];
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
                 }
-                
-                // Embaralhar as opções
-                options = options.sort(() => Math.random() - 0.5);
-                
-                questions.push({
-                    question: `${num1} + ${num2} = ?`,
-                    options: options,
-                    correctAnswer: correctAnswer
-                });
             }
+
+            options = options.sort(() => Math.random() - 0.5);
+
+            questions.push({
+                question: questionTextFormat,
+                options: options,
+                correctAnswer: correctAnswer
+            });
         }
-        
-        // Exibir a pergunta atual
-        function displayQuestion() {
-            const q = questions[currentQuestion];
-            questionText.textContent = q.question;
-            questionCount.textContent = `Questão: ${currentQuestion + 1}`;
+    }
+
+
+
+    // EXIBIR PERGUNTAS
+    function displayQuestion() {
+        const q = questions[currentQuestion];
+        questionText.textContent = q.question;
+        questionCount.textContent = `Questão: ${currentQuestion + 1}`;
+        scoreValue.textContent = score;
+
+        optionsContainer.innerHTML = '';
+        feedback.textContent = '';
+
+        q.options.forEach(option => {
+            const button = document.createElement('button');
+            button.className = 'option';
+            button.textContent = option;
+            button.addEventListener('click', () => checkAnswer(option, button));
+            optionsContainer.appendChild(button);
+        });
+    }
+
+
+
+    // VERIFICAR RESPOSTA
+    function checkAnswer(selectedOption, button) {
+
+        const q = questions[currentQuestion];
+
+        const optionButtons = document.querySelectorAll('.option');
+        optionButtons.forEach(btn => {
+            btn.disabled = true;
+            if (parseInt(btn.textContent) === q.correctAnswer) {
+                btn.classList.add('correct');
+            }
+        });
+
+        if (selectedOption === q.correctAnswer) {
+            button.classList.add('correct');
+            feedback.textContent = 'Correto!';
+            feedback.classList.add('correct');
+            score++;
             scoreValue.textContent = score;
-            
-            // Limpar opções anteriores
-            optionsContainer.innerHTML = '';
-            feedback.textContent = '';
-            
-            // Adicionar novas opções
-            q.options.forEach(option => {
-                const button = document.createElement('button');
-                button.className = 'option';
-                button.textContent = option;
-                button.addEventListener('click', () => checkAnswer(option, button));
-                optionsContainer.appendChild(button);
-            });
-        }
-        
-        // Verificar resposta
-        function checkAnswer(selectedOption, button) {
-            const q = questions[currentQuestion];
-            
-            // Desabilitar todos os botões de opção
-            const optionButtons = document.querySelectorAll('.option');
-            optionButtons.forEach(btn => {
-                btn.disabled = true;
-                if (parseInt(btn.textContent) === q.correctAnswer) {
-                    btn.classList.add('correct');
-                }
-            });
-            
-            // Verificar se a resposta está correta
-            if (selectedOption === q.correctAnswer) {
-                button.classList.add('correct');
-                feedback.textContent = 'Correto!';
-                feedback.classList.add('correct');
-                score++;
-                scoreValue.textContent = score;
-            } else {
-                wrongAnswers++
-                button.classList.add('incorrect');
-                feedback.textContent = `Incorreto! A resposta correta é ${q.correctAnswer}.`;
-                feedback.classList.add('incorrect');
-            }
-            
-            // Iniciar contagem regressiva para próxima pergunta
-            startCountdown();
-        }
-        
-        // Iniciar contagem regressiva para passar de questao
-        function startCountdown() {
-            let countdown = 0.5;
-            
-            // Limpar qualquer intervalo anterior
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-            }
-            
-            countdownInterval = setInterval(() => {
-                countdown--;
-                
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    nextQuestion();
-                }
-            }, 1000);
+        } else {
+            wrongAnswers++;
+            button.classList.add('incorrect');
+            feedback.textContent = `Incorreto! A resposta correta é ${q.correctAnswer}.`;
+            feedback.classList.add('incorrect');
         }
 
-        // Iniciar contagem regressiva para acabar o jogo
-        function startEndCountdown() {
-            // Limpar qualquer intervalo anterior
-            if (countdownEndInterval) {
-                clearInterval(countdownEndInterval);
+        startCountdown();
+    }
+
+    // CONTAGEM PARA PASSAR DE PERGUNTA
+    function startCountdown() {
+        let countdown = 0.5;
+
+        if (countdownInterval) clearInterval(countdownInterval);
+
+        countdownInterval = setInterval(() => {
+            countdown--;
+
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                nextQuestion();
             }
-            
-            // Atualizar a barra de tempo imediatamente
+        }, 1000);
+    }
+
+
+    // CONTAGEM PARA ACABAR O JOGO
+    function startEndCountdown() {
+
+        if (countdownEndInterval) clearInterval(countdownEndInterval);
+
+        updateTimeBar();
+
+        countdownEndInterval = setInterval(() => {
+            timer--;
             updateTimeBar();
-            
-            countdownEndInterval = setInterval(() => {
-                timer--;
-                updateTimeBar();
-                
-                if (timer <= 0) {
-                    clearInterval(countdownEndInterval);
-                    endGame();
-                }
-            }, 1000);
-        }
-        
-        // Navegar para a próxima pergunta
-        function nextQuestion() {
-            if (wrongAnswers <= 0 && timer > 0) {
-                currentQuestion++;
-                displayQuestion();
-            } else {
-                // Fim do jogo
+
+            if (timer <= 0) {
+                clearInterval(countdownEndInterval);
                 endGame();
             }
-        }
-        
-        // Finalizar o jogo
-        function endGame() {
-            clearInterval(countdownEndInterval);
-            const container = document.querySelector('.container');
-            container.innerHTML = `
-                <div class="game-over">
-                    <h1>Fim do Jogo!</h1>
-                    <div class="score" style="font-size: 24px; margin: 20px 0;">
-                        Sua pontuação final: ${score}
-                    </div>
-                    <p>Obrigado por jogar!</p>
-                    <div class="button-group">
-                        <button class="restart-btn" id="restart-btn">Voltar</button>
-                        <button class="score-btn" id="score-btn">Pontuação</button>
-                    </div>
-                </div>
-            `;
-            
-            // Esconder a barra de tempo
-            document.querySelector('.time-container').style.display = 'none';
-            
-            // Salva a pontuação globalmente e no localStorage
-            window.score = score;
-            localStorage.setItem("pontuacao-medio", score);
-            
-            document.getElementById('restart-btn').addEventListener('click', sendBack);
-            document.getElementById('score-btn').addEventListener('click', goToScore);
-        }
-        
-        // Voltar para a tela inicial
-        function sendBack() {
-            window.location.href = "tela-inicial.html";
-        }
+        }, 1000);
+    }
 
-        // Ir para a tela de pontuação
-        function goToScore() {
-            window.location.href = "tela-de-pontuacao-medio.html";
-        }
-        
-        // Inicializar o jogo
-        function initGame() {
-            generateQuestions();
+
+    // PRÓXIMA QUESTÃO
+    function nextQuestion() {
+        if (wrongAnswers <= 0 && timer > 0) {
+            currentQuestion++;
             displayQuestion();
-            startEndCountdown(); // Iniciar a contagem regressiva do tempo total
+        } else {
+            endGame();
         }
-        
-        // Iniciar o jogo quando a página carregar
-        initGame();
-    </script>
+    }
+
+
+
+    // FINAL DO JOGO
+
+    function endGame() {
+
+        clearInterval(countdownEndInterval);
+
+        const container = document.querySelector('.container');
+
+        container.innerHTML = `
+            <div class="game-over">
+                <h1>Fim do Jogo!</h1>
+                <div class="score" style="font-size: 24px; margin: 20px 0;">
+                    Sua pontuação final: ${score}
+                </div>
+                <p>Obrigado por jogar!</p>
+                <div class="button-group">
+                    <button class="restart-btn" id="restart-btn">Voltar</button>
+                    <button class="score-btn" id="score-btn">Pontuação</button>
+                </div>
+            </div>
+        `;
+
+        document.querySelector('.time-container').style.display = 'none';
+
+        window.score = score;
+        localStorage.setItem("pontuacao-medio", score);
+
+        document.getElementById('restart-btn').addEventListener('click', sendBack);
+        document.getElementById('score-btn').addEventListener('click', goToScore);
+    }
+
+
+    function sendBack() {
+        window.location.href = "tela-inicial.html";
+    }
+
+    function goToScore() {
+        window.location.href = "tela-de-pontuacao-medio.html";
+    }
+
+
+    function initGame() {
+        generateQuestions();
+        displayQuestion();
+        startEndCountdown();
+    }
+
+</script>
+
+
     <script src="../arquivos JavaScript/script-musica.js"></script>
       <script src="../arquivos JavaScript/script-brilho.js"></script>
 
