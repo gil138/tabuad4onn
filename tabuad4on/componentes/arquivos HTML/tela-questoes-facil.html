@@ -181,171 +181,184 @@
         </div>
     </div>
 
-    <script>
-        // Variáveis do jogo
-        let currentQuestion = 0;
-        let score = 0;
-        let questions = [];
-        const totalQuestions = 9999;
-        let countdownInterval;
-        let wrongAnswers = 0;
-        let difficultyIncrement = 0.05;
-        
-        // Elementos do DOM
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const questionCount = document.getElementById('question-count');
-        const scoreValue = document.getElementById('score-value');
-        const feedback = document.getElementById('feedback');
-        
-        // Gerar perguntas aleatórias
-        function generateQuestions() {
-            questions = [];
-            for (let i = 0; i < totalQuestions; i++) {
-                const num1 = Math.floor(i/(difficultyIncrement * 20)) + Math.floor(Math.random() * 10 * (1 + i * difficultyIncrement)) + 1;
-                const num2 = Math.floor(i/(difficultyIncrement * 20)) + Math.floor(Math.random() * 10 * (1 + i * difficultyIncrement)) + 1;
-                const correctAnswer = num1 + num2;
-                
-                // Gerar opções de resposta
-                let options = [correctAnswer];
-                while (options.length < 4) {
-                    const randomOption = Math.floor(i/(difficultyIncrement * 20)) + Math.floor(Math.random() * 20 * (1 + i * 0.1)) + 1;
-                    if (!options.includes(randomOption)) {
-                        options.push(randomOption);
-                    }
+<script>
+
+    fetch("../arquivo-json/niveis.json")
+        .then(response => response.json())
+        .then(data => {
+            config = data;
+
+            modoSelecionado = config.modos.facil;
+
+            generateQuestions();
+            displayQuestion();
+        })
+        .catch(error => {
+            console.error("Erro ao carregar o JSON:", error);
+        });
+
+    let currentQuestion = 0;
+    let score = 0;
+    let questions = [];
+    let countdownInterval;
+    let wrongAnswers = 0;
+    let difficultyIncrement = 0.05;
+
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const questionCount = document.getElementById('question-count');
+    const scoreValue = document.getElementById('score-value');
+    const feedback = document.getElementById('feedback');
+
+
+    function generateQuestions() {
+
+        const intervalo = modoSelecionado.intervaloNumeros;
+        const operacoes = modoSelecionado.operacoes;
+        const totalPerguntas = modoSelecionado.totalPerguntas;
+
+        questions = [];
+
+        for (let i = 0; i < totalPerguntas; i++) {
+
+            const num1 = Math.floor(Math.random() * (intervalo[1] - intervalo[0] + 1)) + intervalo[0];
+            const num2 = Math.floor(Math.random() * (intervalo[1] - intervalo[0] + 1)) + intervalo[0];
+
+            const operation = operacoes[0];
+            let correctAnswer = num1 + num2;
+
+            const questionTextFormat = `${num1} ${operation} ${num2} = ?`;
+
+            // Gera opções
+            let options = [correctAnswer];
+            while (options.length < 4) {
+                let randomOption = Math.floor(Math.random() * (intervalo[1] - intervalo[0] + 1)) + intervalo[0];
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
                 }
-                
-                // Embaralhar as opções
-                options = options.sort(() => Math.random() - 0.5);
-                
-                questions.push({
-                    question: `${num1} + ${num2} = ?`,
-                    options: options,
-                    correctAnswer: correctAnswer
-                });
             }
+
+            options = options.sort(() => Math.random() - 0.5);
+
+            questions.push({
+                question: questionTextFormat,
+                options: options,
+                correctAnswer: correctAnswer
+            });
         }
-        
-        // Exibir a pergunta atual
-        function displayQuestion() {
-            const q = questions[currentQuestion];
-            questionText.textContent = q.question;
-            questionCount.textContent = `Questão: ${currentQuestion + 1}`;
+    }
+
+
+    // Exibir a pergunta atual
+    function displayQuestion() {
+        const q = questions[currentQuestion];
+        questionText.textContent = q.question;
+        questionCount.textContent = `Questão: ${currentQuestion + 1}`;
+        scoreValue.textContent = score;
+
+        optionsContainer.innerHTML = '';
+        feedback.textContent = '';
+
+        q.options.forEach(option => {
+            const button = document.createElement('button');
+            button.className = 'option';
+            button.textContent = option;
+            button.addEventListener('click', () => checkAnswer(option, button));
+            optionsContainer.appendChild(button);
+        });
+    }
+
+    // Verificar resposta
+    function checkAnswer(selectedOption, button) {
+        const q = questions[currentQuestion];
+
+        const optionButtons = document.querySelectorAll('.option');
+        optionButtons.forEach(btn => {
+            btn.disabled = true;
+            if (parseInt(btn.textContent) === q.correctAnswer) {
+                btn.classList.add('correct');
+            }
+        });
+
+        if (selectedOption === q.correctAnswer) {
+            button.classList.add('correct');
+            feedback.textContent = 'Correto!';
+            feedback.classList.add('correct');
+            score++;
             scoreValue.textContent = score;
-            
-            // Limpar opções anteriores
-            optionsContainer.innerHTML = '';
-            feedback.textContent = '';
-            
-            // Adicionar novas opções
-            q.options.forEach(option => {
-                const button = document.createElement('button');
-                button.className = 'option';
-                button.textContent = option;
-                button.addEventListener('click', () => checkAnswer(option, button));
-                optionsContainer.appendChild(button);
-            });
-        }
-        
-        // Verificar resposta
-        function checkAnswer(selectedOption, button) {
-            const q = questions[currentQuestion];
-            
-            // Desabilitar todos os botões de opção
-            const optionButtons = document.querySelectorAll('.option');
-            optionButtons.forEach(btn => {
-                btn.disabled = true;
-                if (parseInt(btn.textContent) === q.correctAnswer) {
-                    btn.classList.add('correct');
-                }
-            });
-            
-            // Verificar se a resposta está correta
-            if (selectedOption === q.correctAnswer) {
-                button.classList.add('correct');
-                feedback.textContent = 'Correto!';
-                feedback.classList.add('correct');
-                score++;
-                scoreValue.textContent = score;
-            } else {
-                wrongAnswers++
-                button.classList.add('incorrect');
-                feedback.textContent = `Incorreto! A resposta correta é ${q.correctAnswer}.`;
-                feedback.classList.add('incorrect');
-            }
-            
-            // Iniciar contagem regressiva para próxima pergunta
-            startCountdown();
-        }
-        
-        // Iniciar contagem regressiva
-        function startCountdown() {
-            let countdown = 2;
-            
-            // Limpar qualquer intervalo anterior
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-            }
-            
-            countdownInterval = setInterval(() => {
-                countdown--;
-                
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    nextQuestion();
-                }
-            }, 1000);
-        }
-        
-        // Navegar para a próxima pergunta
-        function nextQuestion() {
-            if (wrongAnswers <= 0) {
-                currentQuestion++;
-                displayQuestion();
-            } else {
-                // Fim do jogo
-                endGame();
-            }
-        }
-        
-        // Finalizar o jogo
-        function endGame() {
-            const container = document.querySelector('.container');
-            container.innerHTML = `
-                <div class="game-over">
-                    <h1>Fim do Jogo!</h1>
-                    <div class="score" style="font-size: 24px; margin: 20px 0;">
-                        Sua pontuação final: ${score}
-                    </div>
-                    <p>Obrigado por jogar!</p>
-                    <div class="button-group">
-                        <button class="restart-btn" id="restart-btn">Voltar</button>
-                        <button class="score-btn" id="score-btn">Pontuação</button>
-                    </div>
-                </div>
-            `;
-                // Salva a pontuação globalmente e no localStorage
-    window.score = score;
-    localStorage.setItem("pontuacao-facil", score);
-            
-            document.getElementById('restart-btn').addEventListener('click', sendBack);
-            document.getElementById('score-btn').addEventListener('click', goToScore);
-        }
-        
-        // Voltar para a tela inicial
-        function sendBack() {
-            window.location.href = "tela-inicial.html";
+        } else {
+            wrongAnswers++
+            button.classList.add('incorrect');
+            feedback.textContent = `Incorreto! A resposta correta é ${q.correctAnswer}.`;
+            feedback.classList.add('incorrect');
         }
 
-        // Ir para a tela de pontuação
-        function goToScore() {
-            window.location.href = "tela-de-pontuacao-facil.html";
+        startCountdown();
+    }
+
+    // Iniciar contagem regressiva
+    function startCountdown() {
+        let countdown = 2;
+
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
         }
-        
-        // Inicializar o jogo
-        generateQuestions();
-        displayQuestion();
-    </script>
+
+        countdownInterval = setInterval(() => {
+            countdown--;
+
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+
+    function nextQuestion() {
+        if (currentQuestion + 1 < questions.length) {
+            currentQuestion++;
+            displayQuestion();
+        } else {
+            endGame();
+        }
+    }
+
+
+    function endGame() {
+        const container = document.querySelector('.container');
+        container.innerHTML = `
+            <div class="game-over">
+                <h1>Fim do Jogo!</h1>
+                <div class="score" style="font-size: 24px; margin: 20px 0;">
+                    Sua pontuação final: ${score}
+                </div>
+                <p>Obrigado por jogar!</p>
+                <div class="button-group">
+                    <button class="restart-btn" id="restart-btn">Voltar</button>
+                    <button class="score-btn" id="score-btn">Pontuação</button>
+                </div>
+            </div>
+        `;
+
+        window.score = score;
+        localStorage.setItem("pontuacao-facil", score);
+
+        document.getElementById('restart-btn').addEventListener('click', sendBack);
+        document.getElementById('score-btn').addEventListener('click', goToScore);
+    }
+
+
+    function sendBack() {
+        window.location.href = "tela-inicial.html";
+    }
+
+    function goToScore() {
+        window.location.href = "tela-de-pontuacao-facil.html";
+    }
+
+</script>
+
 
     <script src="../arquivos JavaScript/script-musica.js"></script>
       <script src="../arquivos JavaScript/script-brilho.js"></script>
