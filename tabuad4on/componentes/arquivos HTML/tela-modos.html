@@ -79,7 +79,7 @@
     window.location.href = "tela-questoes-dificil.html";
   });
 
-  // 🎯 Botões de ranking → cada um vai para sua tela específica
+  // Botões de ranking
   document.getElementById("ranking-facil").addEventListener("click", (event) => {
     event.stopPropagation();
     window.location.href = "tela-de-pontuacao-facil.html";
@@ -95,12 +95,7 @@
     window.location.href = "tela-de-pontuacao-dificil.html";
   });
 
-  document.getElementById("ranking-customizado").addEventListener("click", (event) => {
-    event.stopPropagation();
-    window.location.href = "tela-de-pontuacao-customizado.html";
-  });
-
-  // Botões de interrogação → instruções por modo
+  // Botões de instrução (interrogação)
   document.getElementById("ajuda-facil").addEventListener("click", (event) => {
     event.stopPropagation();
     window.location.href = "tela-instrucao-facil.html";
@@ -115,77 +110,8 @@
     event.stopPropagation();
     window.location.href = "tela-instrucao-dificil.html";
   });
-
-  document.getElementById("ajuda-customizado").addEventListener("click", (event) => {
-    event.stopPropagation();
-    window.location.href = "tela-instrucao-aprendizado.html";
-  });
 </script>
-<script>
-  // Botão Voltar → leva à tela inicial
-  document.getElementById("botao-voltar").addEventListener("click", () => {
-    window.location.href = "tela-inicial.html";
-  });
 
-  // Modos de jogo
-  document.getElementById("modo-facil").addEventListener("click", () => {
-    window.location.href = "tela-questoes-facil.html";
-  });
-
-  document.getElementById("modo-medio").addEventListener("click", () => {
-    window.location.href = "tela-questoes-medio.html";
-  });
-
-  document.getElementById("modo-dificil").addEventListener("click", () => {
-    window.location.href = "tela-questoes-dificil.html";
-  });
-
-  document.getElementById("modo-customizado").addEventListener("click", () => {
-    window.location.href = "tela-questoes-customizadas.html";
-  });
-
-  // Botões de ranking → cada um vai para sua tela específica
-  document.getElementById("ranking-facil").addEventListener("click", (event) => {
-    event.stopPropagation();
-    window.location.href = "tela-de-pontuacao-facil.html";
-  });
-
-  document.getElementById("ranking-medio").addEventListener("click", (event) => {
-    event.stopPropagation();
-    window.location.href = "tela-de-pontuacao-medio.html";
-  });
-
-  document.getElementById("ranking-dificil").addEventListener("click", (event) => {
-    event.stopPropagation();
-    window.location.href = "tela-de-pontuacao-dificil.html";
-  });
-
-  document.getElementById("ranking-customizado").addEventListener("click", (event) => {
-    event.stopPropagation();
-    window.location.href = "tela-de-pontuacao-customizado.html";
-  });
-
-  // Botões de interrogação → instruções por modo
-  document.getElementById("ajuda-facil").addEventListener("click", (event) => {
-    event.stopPropagation();
-    window.location.href = "tela-instrucao-facil.html";
-  });
-
-  document.getElementById("ajuda-medio").addEventListener("click", (event) => {
-    event.stopPropagation();
-    window.location.href = "tela-instrucao-medio.html";
-  });
-
-  document.getElementById("ajuda-dificil").addEventListener("click", (event) => {
-    event.stopPropagation();
-    window.location.href = "tela-instrucao-dificil.html";
-  });
-
-  document.getElementById("ajuda-customizado").addEventListener("click", (event) => {
-    event.stopPropagation();
-    window.location.href = "tela-instrucao-aprendizado.html";
-  });
-</script>
   <script src="../arquivos JavaScript/script-musica.js"></script>
     <script src="../arquivos JavaScript/script-brilho.js"></script>
 
