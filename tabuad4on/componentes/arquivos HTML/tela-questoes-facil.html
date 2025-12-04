@@ -270,6 +270,7 @@
 
     // Verificar resposta
     function checkAnswer(selectedOption, button) {
+        feedback.classList.remove('correct', 'incorrect');
         const q = questions[currentQuestion];
 
         const optionButtons = document.querySelectorAll('.option');
