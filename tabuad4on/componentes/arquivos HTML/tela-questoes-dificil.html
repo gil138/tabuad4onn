@@ -156,6 +156,54 @@
             margin-top: 10px;
         }
 
+        /* Barra de tempo */
+        .time-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .time-text {
+            font-weight: bold;
+        }
+
+        .time-bar-container {
+            width: 100%;
+            height: 12px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .time-bar {
+            height: 100%;
+            background-color: white;
+            border-radius: 6px;
+            transition: width 1s linear;
+            width: 100%;
+        }
+
+        .time-bar.warning {
+            background-color: #ffc107;
+        }
+
+        .time-bar.danger {
+            background-color: #dc3545;
+        }
+
         .radical {
             font-size: 32px;
             vertical-align: middle;
@@ -191,6 +239,17 @@
         </div>
     </div>
 
+    <!-- Barra de tempo -->
+    <div class="time-container">
+        <div class="time-info">
+            <span class="time-text">Tempo Restante:</span>
+            <span id="time-value">60s</span>
+        </div>
+        <div class="time-bar-container">
+            <div class="time-bar" id="time-bar"></div>
+        </div>
+    </div>
+
 <script>
     // Variáveis do jogo
     let currentQuestion = 0;
@@ -199,13 +258,31 @@
     let countdownInterval;
     let wrongAnswers = 0;
     let difficultyIncrement = 0.05;
-
+    let timer = 120;
+    const initialTimer = timer;
+    
     // Elementos do DOM
     const questionText = document.getElementById('question-text');
     const optionsContainer = document.getElementById('options-container');
     const questionCount = document.getElementById('question-count');
     const scoreValue = document.getElementById('score-value');
     const feedback = document.getElementById('feedback');
+    const timeValue = document.getElementById('time-value');
+    const timeBar = document.getElementById('time-bar');
+    
+    // ATUALIZAR BARRA DE TEMPO
+    function updateTimeBar() {
+        const percentage = (timer / initialTimer) * 100;
+        timeBar.style.width = `${percentage}%`;
+        timeValue.textContent = `${timer}s`;
+
+        timeBar.classList.remove('warning', 'danger');
+        if (percentage <= 33) {
+            timeBar.classList.add('danger');
+        } else if (percentage <= 66) {
+            timeBar.classList.add('warning');
+        }
+    }
 
     fetch("../arquivo-json/niveis.json")
         .then(res => res.json())
@@ -216,7 +293,8 @@
             displayQuestion();
         })
         .catch(err => console.error("Erro ao carregar JSON:", err));
-
+    
+        
     function generateQuestionsFromJSON(config) {
 
         const tipos = config.tiposQuestoes;  
@@ -387,6 +465,24 @@
             if (countdown <= 0) {
                 clearInterval(countdownInterval);
                 nextQuestion();
+            }
+        }, 1000);
+    }
+
+    // CONTAGEM PARA ACABAR O JOGO
+    function startEndCountdown() {
+
+        if (countdownEndInterval) clearInterval(countdownEndInterval);
+
+        updateTimeBar();
+
+        countdownEndInterval = setInterval(() => {
+            timer--;
+            updateTimeBar();
+
+            if (timer <= 0) {
+                clearInterval(countdownEndInterval);
+                endGame();
             }
         }, 1000);
     }
